@@ -8,15 +8,6 @@ defmodule Depot.Filesystem do
     otp_app = Keyword.fetch!(opts, :otp_app)
 
     quote bind_quoted: [otp_app: otp_app] do
-      def child_spec(arg) do
-        Depot.Filesystem.child_spec(arg_to_args(arg))
-        |> Map.put(:id, __MODULE__)
-      end
-
-      def start_link(arg) do
-        Depot.Filesystem.start_link(arg_to_args(arg))
-      end
-
       def write(path, contents, opts \\ []) do
         Depot.write(config(), path, contents, opts)
       end
@@ -25,8 +16,21 @@ defmodule Depot.Filesystem do
         Depot.read(config(), path, opts)
       end
 
+      def update(path, contents, opts \\ []) do
+        Depot.update(config(), path, contents, opts)
+      end
+
       def delete(path) do
         Depot.delete(config(), path)
+      end
+
+      def child_spec(arg) do
+        Depot.Filesystem.child_spec(arg_to_args(arg))
+        |> Map.put(:id, __MODULE__)
+      end
+
+      def start_link(arg) do
+        Depot.Filesystem.start_link(arg_to_args(arg))
       end
 
       def init(config), do: config

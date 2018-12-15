@@ -24,6 +24,23 @@ defmodule Depot.Adapters.CommonTest do
         end
       end
 
+      property "updating a file changes it's content",
+               %{adapter: adapter, config: config} do
+        check all path <- path(),
+                  content <- iodata(),
+                  content_2 <- iodata(),
+                  IO.iodata_to_binary(content) != IO.iodata_to_binary(content_2) do
+          :ok = adapter.write(config, path, content)
+          {:ok, read} = adapter.read(config, path)
+          :ok = adapter.write(config, path, content_2)
+          {:ok, read_updated} = adapter.read(config, path)
+
+          assert IO.iodata_to_binary(content) == IO.iodata_to_binary(read)
+          assert IO.iodata_to_binary(content_2) == IO.iodata_to_binary(read_updated)
+          assert IO.iodata_to_binary(read) != IO.iodata_to_binary(read_updated)
+        end
+      end
+
       property "deleted files cannot be read again",
                %{adapter: adapter, config: config} do
         check all path <- path(), content <- iodata() do

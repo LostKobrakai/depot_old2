@@ -17,6 +17,18 @@ defmodule DepotTest do
     assert {:ok, "hello"} = Depot.read(config, "test.txt")
   end
 
+  test "update file", %{config: config} do
+    Depot.write(config, "test.txt", "hello")
+    Depot.update(config, "test.txt", "updated")
+    assert {:ok, "updated"} = Depot.read(config, "test.txt")
+  end
+
+  test "delete file", %{config: config} do
+    Depot.write(config, "test.txt", "hello")
+    Depot.delete(config, "test.txt")
+    assert {:error, _} = Depot.read(config, "test.txt")
+  end
+
   defp setup_adapter(Adapters.InMemory) do
     {:ok, pid} = start_supervised(Adapters.InMemory)
     {:ok, %{pid: pid}}

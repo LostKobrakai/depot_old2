@@ -20,4 +20,16 @@ defmodule Depot.FilesystemTest do
     Filesystem.write("test.txt", "hello")
     assert {:ok, "hello"} = Filesystem.read("test.txt")
   end
+
+  test "update file" do
+    Filesystem.write("test.txt", "hello")
+    Filesystem.update("test.txt", "updated")
+    assert {:ok, "updated"} = Filesystem.read("test.txt")
+  end
+
+  test "delete file" do
+    Filesystem.write("test.txt", "hello")
+    Filesystem.delete("test.txt")
+    assert {:error, _} = Filesystem.read("test.txt")
+  end
 end

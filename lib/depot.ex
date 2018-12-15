@@ -28,7 +28,7 @@ defmodule Depot do
 
   The file is created if it does not exist. If it exists, the previous contents are overwritten. Returns `:ok` if successful, or `{:error, reason}` if an error occurs.
 
-  content must be iodata (a list of bytes or a binary). Setting the encoding for this function has no effect.
+  `content` must be `iodata` (a list of bytes or a binary).
   """
   @spec write(config, Path.t(), iodata(), opts) :: :ok | {:error, error_reason}
   def write(%{adapter: adapter} = config, path, contents, opts \\ []) do
@@ -43,6 +43,24 @@ defmodule Depot do
     adapter.read(Map.drop(config, [:adapter]), path, opts)
   end
 
+  @doc """
+  Updates `content` of the file `path`.
+
+  Returns `:ok` if successful, or `{:error, reason}` if an error occurs.
+
+  `content` must be `iodata` (a list of bytes or a binary).
+  """
+  @spec update(config, Path.t(), iodata(), opts) :: :ok | {:error, error_reason}
+  def update(%{adapter: adapter} = config, path, contents, opts \\ []) do
+    adapter.update(Map.drop(config, [:adapter]), path, contents, opts)
+  end
+
+  @doc """
+  Tries to delete the file path.
+
+  Returns :ok if successful, or {:error, reason} if an error occurs.
+  """
+  @spec delete(config, Path.t()) :: :ok | {:error, error_reason}
   def delete(%{adapter: adapter} = config, path) do
     adapter.delete(Map.drop(config, [:adapter]), path)
   end

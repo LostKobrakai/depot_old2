@@ -30,7 +30,8 @@ defmodule Depot.MixProject do
   defp deps do
     [
       {:briefly, "~> 0.3", only: :test},
-      {:stream_data, "~> 0.4.2", only: :test}
+      {:stream_data, "~> 0.4.2", only: :test},
+      {:inch_ex, "~> 2.0.0-rc1", only: [:dev, :test]}
     ]
   end
 end

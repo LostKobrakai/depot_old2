@@ -24,6 +24,11 @@ defmodule Depot.Adapter do
   @type opts :: Keyword.t()
 
   @doc """
+  Start the adapter if it needs a long running process
+  """
+  @callback child_spec(term) :: Supervisor.child_spec()
+
+  @doc """
   Writes `content` to the file `path`.
 
   The file must be created if it does not exist. If it exists, the previous
@@ -42,7 +47,11 @@ defmodule Depot.Adapter do
   @callback read(config, Path.t(), opts) :: {:ok, iodata()} | {:error, error_reason}
 
   @doc """
-  Writes `content` to the existing file `path`.
+  Updates `content` of the file `path`.
+
+  Returns `:ok` if successful, or `{:error, reason}` if an error occurs.
+
+  `content` must be `iodata` (a list of bytes or a binary).
 
   This can often times just delegate to `c:write/4`, but offers the opportunity
   to have `c:write/4` create folders, while `c:update/4` does expect the file and
@@ -56,4 +65,6 @@ defmodule Depot.Adapter do
   Returns :ok if successful, or {:error, reason} if an error occurs.
   """
   @callback delete(config, Path.t()) :: :ok | {:error, error_reason}
+
+  @optional_callbacks child_spec: 1
 end

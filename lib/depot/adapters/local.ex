@@ -4,20 +4,24 @@ defmodule Depot.Adapters.Local do
   """
   @behaviour Depot.Adapter
 
+  @impl true
   def write(config, path, contents, _opts \\ []) do
     path = full_path(config, path)
     :ok = File.mkdir_p(Path.dirname(path))
     File.write(path, contents)
   end
 
+  @impl true
   def read(config, path, _opts \\ []) do
     File.read(full_path(config, path))
   end
 
+  @impl true
   def update(config, path, contents, opts \\ []) do
     write(config, path, contents, opts)
   end
 
+  @impl true
   def delete(%{root: root} = config, path) do
     path = full_path(config, path)
 
