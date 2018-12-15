@@ -1,6 +1,6 @@
 defmodule Depot.Adapters.Local do
   @moduledoc """
-  In Memory implementation for `Depot.Adapter`
+  Local filesystem implementation for `Depot.Adapter`
   """
   @behaviour Depot.Adapter
 

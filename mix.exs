@@ -31,7 +31,8 @@ defmodule Depot.MixProject do
     [
       {:briefly, "~> 0.3", only: :test},
       {:stream_data, "~> 0.4.2", only: :test},
-      {:inch_ex, "~> 2.0.0-rc1", only: [:dev, :test]}
+      {:inch_ex, "~> 2.0.0-rc1", only: [:dev, :test]},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false}
     ]
   end
 end

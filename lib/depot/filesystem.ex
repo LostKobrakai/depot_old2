@@ -1,6 +1,6 @@
 defmodule Depot.Filesystem do
   @moduledoc """
-
+  Convenience module to represent a filesystem configuration as a module.
   """
   use Supervisor
 
