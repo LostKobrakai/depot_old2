@@ -51,6 +51,21 @@ defmodule Depot.Adapters.CommonTest do
           assert {:error, _} = adapter.read(config, path)
         end
       end
+
+      property "copy file",
+               %{adapter: adapter, config: config} do
+        check all source <- path(),
+                  destination <- path(),
+                  content <- iodata(),
+                  source != destination do
+          :ok = adapter.write(config, source, content)
+          {:error, _} = adapter.read(config, destination)
+          :ok = adapter.copy(config, source, destination)
+          {:ok, read} = adapter.read(config, destination)
+
+          assert IO.iodata_to_binary(content) == IO.iodata_to_binary(read)
+        end
+      end
     end
   end
 
@@ -65,7 +80,7 @@ defmodule Depot.Adapters.CommonTest do
   end
 
   defp path do
-    gen all segments <- list_of(dir_or_rootname(), min_length: 1, max_length: 15),
+    gen all segments <- list_of(dir_or_rootname(), min_length: 1, max_length: 10),
             maybe_extention <- one_of([extention(), constant("")]) do
       segments
       |> Path.join()

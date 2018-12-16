@@ -36,4 +36,17 @@ defmodule Depot.Adapters.InMemory do
   def delete(%{pid: pid}, path) do
     Agent.update(pid, &Map.delete(&1, path))
   end
+
+  @impl true
+  def copy(%{pid: pid}, source, destination) do
+    Agent.get_and_update(pid, fn state ->
+      with {:ok, contents} <- Map.fetch(state, source),
+           :error <- Map.fetch(state, destination) do
+        {:ok, Map.put(state, destination, contents)}
+      else
+        :error -> {{:error, :nosource}, state}
+        {:ok, _} -> {{:error, :destinationexists}, state}
+      end
+    end)
+  end
 end

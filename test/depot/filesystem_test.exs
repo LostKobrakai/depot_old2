@@ -32,4 +32,10 @@ defmodule Depot.FilesystemTest do
     Filesystem.delete("test.txt")
     assert {:error, _} = Filesystem.read("test.txt")
   end
+
+  test "copy file" do
+    Filesystem.write("test.txt", "hello")
+    Filesystem.copy("test.txt", "test_2.txt")
+    assert {:ok, "hello"} = Filesystem.read("test_2.txt")
+  end
 end

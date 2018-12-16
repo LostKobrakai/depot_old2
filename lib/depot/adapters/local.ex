@@ -30,6 +30,22 @@ defmodule Depot.Adapters.Local do
     end
   end
 
+  @impl true
+  def copy(%{root: root} = config, source, destination) do
+    source = full_path(config, source)
+    destination = full_path(config, destination)
+    :ok = File.mkdir_p(Path.dirname(destination))
+
+    case File.cp(source, destination, fn _, _ -> false end) do
+      :ok ->
+        :ok
+
+      result ->
+        recursively_delete_empty_folders(destination, root)
+        result
+    end
+  end
+
   defp full_path(%{root: root}, path) do
     Path.join(root, path)
   end

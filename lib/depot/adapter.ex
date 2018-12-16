@@ -66,5 +66,14 @@ defmodule Depot.Adapter do
   """
   @callback delete(config, Path.t()) :: :ok | {:error, error_reason}
 
+  @doc """
+  Copies the contents in `source` to `destination`.
+
+  If a file already exists in the destination, the function must abort.
+
+  The function returns `:ok` in case of success, returns `{:error, reason}` otherwise.
+  """
+  @callback copy(config, Path.t(), Path.t()) :: :ok | {:error, error_reason}
+
   @optional_callbacks child_spec: 1
 end

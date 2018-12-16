@@ -64,4 +64,14 @@ defmodule Depot do
   def delete(%{adapter: adapter} = config, path) do
     adapter.delete(Map.drop(config, [:adapter]), path)
   end
+
+  @doc """
+  Copies the contents in `source` to `destination`.
+
+  Returns :ok if successful, or {:error, reason} if an error occurs.
+  """
+  @spec copy(config, Path.t(), Path.t()) :: :ok | {:error, error_reason}
+  def copy(%{adapter: adapter} = config, source, destination) do
+    adapter.copy(Map.drop(config, [:adapter]), source, destination)
+  end
 end
