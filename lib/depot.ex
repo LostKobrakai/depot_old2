@@ -74,4 +74,23 @@ defmodule Depot do
   def copy(%{adapter: adapter} = config, source, destination) do
     adapter.copy(Map.drop(config, [:adapter]), source, destination)
   end
+
+  @doc """
+  Renames the `source` file to `destination` file. It can be used to move files (and directories) between directories. If moving a file, you must fully specify the `destination` filename, it is not sufficient to simply specify its directory.
+
+  Returns `:ok` in case of success, `{:error, reason}` otherwise.
+
+  If the filesystem does not support atomic renaming this will fallback to
+  `copy/3` and `delete/2`.
+  """
+  @spec rename(config, Path.t(), Path.t()) :: :ok | {:error, error_reason}
+  def rename(%{adapter: adapter} = config, source, destination) do
+    with :unsupported <- adapter.rename(Map.drop(config, [:adapter]), source, destination),
+         :ok <- copy(config, source, destination),
+         :ok <- delete(config, source) do
+      :ok
+    end
+  end
+
+  defdelegate move(config, source, destination), to: __MODULE__, as: :rename
 end

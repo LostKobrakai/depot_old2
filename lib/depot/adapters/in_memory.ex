@@ -49,4 +49,17 @@ defmodule Depot.Adapters.InMemory do
       end
     end)
   end
+
+  @impl true
+  def rename(%{pid: pid}, source, destination) do
+    Agent.get_and_update(pid, fn state ->
+      with {contents, state} when not is_nil(contents) <- Map.pop(state, source),
+           :error <- Map.fetch(state, destination) do
+        {:ok, Map.put(state, destination, contents)}
+      else
+        :error -> {{:error, :nosource}, state}
+        {:ok, _} -> {{:error, :destinationexists}, state}
+      end
+    end)
+  end
 end

@@ -16,7 +16,7 @@ defmodule Depot.Adapters.CommonTest do
 
       property "any non concurrent write can be read",
                %{adapter: adapter, config: config} do
-        check all path <- path(), content <- iodata() do
+        check all path <- path(), content <- file_content() do
           :ok = adapter.write(config, path, content)
           {:ok, read} = adapter.read(config, path)
 
@@ -27,12 +27,12 @@ defmodule Depot.Adapters.CommonTest do
       property "updating a file changes it's content",
                %{adapter: adapter, config: config} do
         check all path <- path(),
-                  content <- iodata(),
-                  content_2 <- iodata(),
+                  content <- file_content(),
+                  content_2 <- file_content(),
                   IO.iodata_to_binary(content) != IO.iodata_to_binary(content_2) do
           :ok = adapter.write(config, path, content)
           {:ok, read} = adapter.read(config, path)
-          :ok = adapter.write(config, path, content_2)
+          :ok = adapter.update(config, path, content_2)
           {:ok, read_updated} = adapter.read(config, path)
 
           assert IO.iodata_to_binary(content) == IO.iodata_to_binary(read)
@@ -43,7 +43,7 @@ defmodule Depot.Adapters.CommonTest do
 
       property "deleted files cannot be read again",
                %{adapter: adapter, config: config} do
-        check all path <- path(), content <- iodata() do
+        check all path <- path(), content <- file_content() do
           :ok = adapter.write(config, path, content)
           {:ok, _} = adapter.read(config, path)
           :ok = adapter.delete(config, path)
@@ -56,14 +56,32 @@ defmodule Depot.Adapters.CommonTest do
                %{adapter: adapter, config: config} do
         check all source <- path(),
                   destination <- path(),
-                  content <- iodata(),
+                  content <- file_content(),
                   source != destination do
           :ok = adapter.write(config, source, content)
           {:error, _} = adapter.read(config, destination)
           :ok = adapter.copy(config, source, destination)
-          {:ok, read} = adapter.read(config, destination)
+          {:ok, source_content} = adapter.read(config, source)
+          {:ok, destination_content} = adapter.read(config, destination)
 
-          assert IO.iodata_to_binary(content) == IO.iodata_to_binary(read)
+          assert IO.iodata_to_binary(content) == IO.iodata_to_binary(source_content)
+          assert IO.iodata_to_binary(content) == IO.iodata_to_binary(destination_content)
+        end
+      end
+
+      property "rename file",
+               %{adapter: adapter, config: config} do
+        check all source <- path(),
+                  destination <- path(),
+                  content <- file_content(),
+                  source != destination do
+          :ok = adapter.write(config, source, content)
+          {:error, _} = adapter.read(config, destination)
+          :ok = adapter.rename(config, source, destination)
+          {:ok, destination_content} = adapter.read(config, destination)
+
+          assert {:error, _} = adapter.read(config, source)
+          assert IO.iodata_to_binary(content) == IO.iodata_to_binary(destination_content)
         end
       end
     end
@@ -96,5 +114,9 @@ defmodule Depot.Adapters.CommonTest do
     gen all extname <- string(?a..?z, min_length: 1, max_length: 4) do
       ".#{extname}"
     end
+  end
+
+  defp file_content do
+    gen(all content <- iodata(), content != [0], do: content)
   end
 end

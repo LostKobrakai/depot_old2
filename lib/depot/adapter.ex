@@ -75,5 +75,15 @@ defmodule Depot.Adapter do
   """
   @callback copy(config, Path.t(), Path.t()) :: :ok | {:error, error_reason}
 
+  @doc """
+  Renames the `source` file to `destination` file. It can be used to move files (and directories) between directories. If moving a file, you must fully specify the `destination` filename, it is not sufficient to simply specify its directory.
+
+  Returns `:ok` in case of success, `{:error, reason}` otherwise.
+
+  If the filesystem does not support atomic renaming you can return `:unsupported`
+  and the action will fallback to `c:copy/3` and `c:delete/2`.
+  """
+  @callback rename(config, Path.t(), Path.t()) :: :ok | {:error, error_reason} | :unsupported
+
   @optional_callbacks child_spec: 1
 end
