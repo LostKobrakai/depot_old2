@@ -6,7 +6,7 @@ This library is based on the ideas of [flysystem](http://flysystem.thephpleague.
 
 ## TODO
 
-- [ ] Full simple API
+- [x] Full simple API
 - [ ] Streaming Interface
 - [ ] Metadata Handling
 - [ ] Caching
