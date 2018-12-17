@@ -91,6 +91,4 @@ defmodule Depot do
       :ok
     end
   end
-
-  defdelegate move(config, source, destination), to: __MODULE__, as: :rename
 end

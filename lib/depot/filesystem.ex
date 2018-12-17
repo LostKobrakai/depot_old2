@@ -32,8 +32,6 @@ defmodule Depot.Filesystem do
         Depot.rename(config(), source, destination)
       end
 
-      defdelegate move(source, destination), to: __MODULE__, as: :rename
-
       def child_spec(arg) do
         Depot.Filesystem.child_spec(arg_to_args(arg))
         |> Map.put(:id, __MODULE__)
