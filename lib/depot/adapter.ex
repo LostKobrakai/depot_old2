@@ -85,5 +85,10 @@ defmodule Depot.Adapter do
   """
   @callback rename(config, Path.t(), Path.t()) :: :ok | {:error, error_reason} | :unsupported
 
+  @doc """
+  Returns true if a file exists at the given path.
+  """
+  @callback has?(config, Path.t()) :: boolean
+
   @optional_callbacks child_spec: 1
 end

@@ -62,6 +62,12 @@ defmodule Depot.Adapters.Local do
     end
   end
 
+  @impl true
+  def has?(config, path) do
+    path = full_path(config, path)
+    File.regular?(path)
+  end
+
   defp full_path(%{root: root}, path) do
     Path.join([root, path])
   end

@@ -92,6 +92,14 @@ defmodule Depot do
     end
   end
 
+  @doc """
+  Returns true if a file exists at the given path.
+  """
+  @spec has?(config, Path.t()) :: boolean
+  def has?(%{adapter: adapter} = config, path) do
+    adapter.has?(adapter_config(config), path)
+  end
+
   @spec adapter_config(config) :: map
   defp adapter_config(config) do
     Map.drop(config, [:adapter])

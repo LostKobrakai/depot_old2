@@ -62,4 +62,11 @@ defmodule Depot.Adapters.InMemory do
       end
     end)
   end
+
+  @impl true
+  def has?(%{pid: pid}, path) do
+    Agent.get(pid, fn state ->
+      Map.has_key?(state, path)
+    end)
+  end
 end

@@ -87,6 +87,18 @@ defmodule Depot.Adapters.CommonTest do
           assert IO.iodata_to_binary(content) == IO.iodata_to_binary(destination_content)
         end
       end
+
+      property "has a file", %{adapter: adapter} do
+        check all path <- path(), content <- file_content() do
+          {:ok, config} = setup_adapter(adapter)
+
+          refute adapter.has?(config, path)
+
+          :ok = adapter.write(config, path, content)
+
+          assert adapter.has?(config, path)
+        end
+      end
     end
   end
 

@@ -35,6 +35,12 @@ defmodule DepotTest do
     assert {:ok, "hello"} = Depot.read(config, "test_2.txt")
   end
 
+  test "has file", %{config: config} do
+    Depot.write(config, "test.txt", "hello")
+    assert Depot.has?(config, "test.txt")
+    refute Depot.has?(config, "test_2.txt")
+  end
+
   defp setup_adapter(Adapters.InMemory) do
     {:ok, pid} = start_supervised(Adapters.InMemory)
     {:ok, %{pid: pid}}

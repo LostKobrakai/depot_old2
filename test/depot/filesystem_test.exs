@@ -38,4 +38,10 @@ defmodule Depot.FilesystemTest do
     Filesystem.copy("test.txt", "test_2.txt")
     assert {:ok, "hello"} = Filesystem.read("test_2.txt")
   end
+
+  test "has file" do
+    Filesystem.write("test.txt", "hello")
+    assert Filesystem.has?("test.txt")
+    refute Filesystem.has?("test_2.txt")
+  end
 end
