@@ -99,6 +99,25 @@ defmodule Depot.Adapters.CommonTest do
           assert adapter.has?(config, path)
         end
       end
+
+      test "proper path normalization", %{adapter: adapter} do
+        {:ok, config} = setup_adapter(adapter)
+
+        :ok = adapter.write(config, "test.txt", "hello")
+        assert {:ok, "hello"} = adapter.read(config, "test.txt")
+        assert {:ok, "hello"} = adapter.read(config, "/test.txt")
+        assert {:ok, "hello"} = adapter.read(config, "./test.txt")
+        assert {:ok, "hello"} = adapter.read(config, "test/../test.txt")
+      end
+
+      test "preventing escaping root folder", %{adapter: adapter} do
+        {:ok, config} = setup_adapter(adapter)
+
+        :ok = adapter.write(config, "test.txt", "hello")
+        assert {:ok, "hello"} = adapter.read(config, "../test.txt")
+        assert {:ok, "hello"} = adapter.read(config, "./../test.txt")
+        assert {:ok, "hello"} = adapter.read(config, "test/../../test.txt")
+      end
     end
   end
 

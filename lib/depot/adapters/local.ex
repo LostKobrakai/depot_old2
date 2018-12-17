@@ -3,6 +3,7 @@ defmodule Depot.Adapters.Local do
   Local filesystem implementation for `Depot.Adapter`
   """
   @behaviour Depot.Adapter
+  alias Depot.Util
 
   @impl true
   def write(config, path, contents, _opts \\ []) do
@@ -41,7 +42,7 @@ defmodule Depot.Adapters.Local do
         :ok
 
       result ->
-        recursively_delete_empty_folders(destination, config)
+        destination |> Util.normalize_path() |> recursively_delete_empty_folders(config)
         result
     end
   end
@@ -57,7 +58,7 @@ defmodule Depot.Adapters.Local do
         :ok
 
       result ->
-        recursively_delete_empty_folders(destination, config)
+        destination |> Util.normalize_path() |> recursively_delete_empty_folders(config)
         result
     end
   end
@@ -69,7 +70,7 @@ defmodule Depot.Adapters.Local do
   end
 
   defp full_path(%{root: root}, path) do
-    Path.join([root, path])
+    Path.join([root, Util.normalize_path(path)])
   end
 
   defp recursively_delete_empty_folders(path, config) do
