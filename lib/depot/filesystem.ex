@@ -41,36 +41,32 @@ defmodule Depot.Filesystem do
         Depot.Filesystem.start_link(arg_to_args(arg))
       end
 
-      def init(config), do: config
+      def init(config, _), do: config
 
       defp config do
         Depot.ConfigCache.config(__MODULE__)
       end
 
       defp arg_to_args(arg) do
-        opts = [
+        opts = %{
           otp_app: unquote(otp_app),
           module: __MODULE__,
           arg: arg
-        ]
+        }
       end
 
-      defoverridable init: 1
+      defoverridable init: 2
     end
   end
 
-  def start_link(opts) do
-    module = Keyword.fetch!(opts, :module)
-    Supervisor.start_link(__MODULE__, opts, name: module)
+  def start_link(%{module: module} = args) do
+    Supervisor.start_link(__MODULE__, args, name: module)
   end
 
-  def init(opts) do
-    otp_app = Keyword.fetch!(opts, :otp_app)
-    module = Keyword.fetch!(opts, :module)
-
+  def init(%{otp_app: otp_app, module: module, arg: arg}) do
     config =
       Application.fetch_env!(otp_app, module)
-      |> module.init()
+      |> module.init(arg)
       |> Map.new()
 
     unless Code.ensure_loaded?(config.adapter) do
