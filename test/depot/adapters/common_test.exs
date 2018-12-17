@@ -9,14 +9,13 @@ defmodule Depot.Adapters.CommonTest do
   for adapter <- [Adapters.InMemory, Adapters.Local] do
     describe "#{adapter}" do
       setup do
-        adapter = unquote(adapter)
-        {:ok, config} = setup_adapter(adapter)
-        {:ok, adapter: adapter, config: config}
+        {:ok, adapter: unquote(adapter)}
       end
 
-      property "any non concurrent write can be read",
-               %{adapter: adapter, config: config} do
+      property "any non concurrent write can be read", %{adapter: adapter} do
         check all path <- path(), content <- file_content() do
+          {:ok, config} = setup_adapter(adapter)
+
           :ok = adapter.write(config, path, content)
           {:ok, read} = adapter.read(config, path)
 
@@ -24,12 +23,13 @@ defmodule Depot.Adapters.CommonTest do
         end
       end
 
-      property "updating a file changes it's content",
-               %{adapter: adapter, config: config} do
+      property "updating a file changes it's content", %{adapter: adapter} do
         check all path <- path(),
                   content <- file_content(),
                   content_2 <- file_content(),
                   IO.iodata_to_binary(content) != IO.iodata_to_binary(content_2) do
+          {:ok, config} = setup_adapter(adapter)
+
           :ok = adapter.write(config, path, content)
           {:ok, read} = adapter.read(config, path)
           :ok = adapter.update(config, path, content_2)
@@ -41,9 +41,10 @@ defmodule Depot.Adapters.CommonTest do
         end
       end
 
-      property "deleted files cannot be read again",
-               %{adapter: adapter, config: config} do
+      property "deleted files cannot be read again", %{adapter: adapter} do
         check all path <- path(), content <- file_content() do
+          {:ok, config} = setup_adapter(adapter)
+
           :ok = adapter.write(config, path, content)
           {:ok, _} = adapter.read(config, path)
           :ok = adapter.delete(config, path)
@@ -52,12 +53,13 @@ defmodule Depot.Adapters.CommonTest do
         end
       end
 
-      property "copy file",
-               %{adapter: adapter, config: config} do
+      property "copy file", %{adapter: adapter} do
         check all source <- path(),
                   destination <- path(),
                   content <- file_content(),
                   source != destination do
+          {:ok, config} = setup_adapter(adapter)
+
           :ok = adapter.write(config, source, content)
           {:error, _} = adapter.read(config, destination)
           :ok = adapter.copy(config, source, destination)
@@ -69,12 +71,13 @@ defmodule Depot.Adapters.CommonTest do
         end
       end
 
-      property "rename file",
-               %{adapter: adapter, config: config} do
+      property "rename file", %{adapter: adapter} do
         check all source <- path(),
                   destination <- path(),
                   content <- file_content(),
                   source != destination do
+          {:ok, config} = setup_adapter(adapter)
+
           :ok = adapter.write(config, source, content)
           {:error, _} = adapter.read(config, destination)
           :ok = adapter.rename(config, source, destination)
@@ -88,7 +91,7 @@ defmodule Depot.Adapters.CommonTest do
   end
 
   defp setup_adapter(Adapters.InMemory) do
-    {:ok, pid} = start_supervised(Adapters.InMemory)
+    {:ok, pid} = start_supervised(Supervisor.child_spec(Adapters.InMemory, id: make_ref()))
     {:ok, %{pid: pid}}
   end
 

@@ -34,19 +34,7 @@ defmodule Depot.Adapters.Local do
   def copy(config, source, destination) do
     source = full_path(config, source)
     full_destination = full_path(config, destination)
-
-    case File.mkdir_p(Path.dirname(full_destination)) do
-      :ok ->
-        :ok
-
-      result ->
-        IO.inspect(
-          {:copy, full_destination, Path.dirname(full_destination),
-           File.mkdir_p(Path.dirname(full_destination))}
-        )
-
-        :ok = result
-    end
+    :ok = File.mkdir_p(Path.dirname(full_destination))
 
     case File.cp(source, full_destination, fn _, _ -> false end) do
       :ok ->
