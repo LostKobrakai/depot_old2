@@ -4,6 +4,16 @@ Depot is a filesystem abstraction for elixir providing a unified interface over 
 
 This library is based on the ideas of [flysystem](http://flysystem.thephpleague.com/), which is a PHP library providing similar functionality.
 
+## TODO
+
+- [ ] Full simple API
+- [ ] Streaming Interface
+- [ ] Metadata Handling
+- [ ] Caching
+- [ ] Visibility
+- [ ] Middleware Adapters (e.g. CacheToLocal or Pooling)
+- [ ] FileSystem Manager
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
