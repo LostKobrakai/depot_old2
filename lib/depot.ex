@@ -32,7 +32,7 @@ defmodule Depot do
   """
   @spec write(config, Path.t(), iodata(), opts) :: :ok | {:error, error_reason}
   def write(%{adapter: adapter} = config, path, contents, opts \\ []) do
-    adapter.write(Map.drop(config, [:adapter]), path, contents, opts)
+    adapter.write(adapter_config(config), path, contents, opts)
   end
 
   @doc """
@@ -40,7 +40,7 @@ defmodule Depot do
   """
   @spec read(config, Path.t(), opts) :: {:ok, iodata} | {:error, error_reason}
   def read(%{adapter: adapter} = config, path, opts \\ []) do
-    adapter.read(Map.drop(config, [:adapter]), path, opts)
+    adapter.read(adapter_config(config), path, opts)
   end
 
   @doc """
@@ -52,7 +52,7 @@ defmodule Depot do
   """
   @spec update(config, Path.t(), iodata(), opts) :: :ok | {:error, error_reason}
   def update(%{adapter: adapter} = config, path, contents, opts \\ []) do
-    adapter.update(Map.drop(config, [:adapter]), path, contents, opts)
+    adapter.update(adapter_config(config), path, contents, opts)
   end
 
   @doc """
@@ -62,7 +62,7 @@ defmodule Depot do
   """
   @spec delete(config, Path.t()) :: :ok | {:error, error_reason}
   def delete(%{adapter: adapter} = config, path) do
-    adapter.delete(Map.drop(config, [:adapter]), path)
+    adapter.delete(adapter_config(config), path)
   end
 
   @doc """
@@ -72,7 +72,7 @@ defmodule Depot do
   """
   @spec copy(config, Path.t(), Path.t()) :: :ok | {:error, error_reason}
   def copy(%{adapter: adapter} = config, source, destination) do
-    adapter.copy(Map.drop(config, [:adapter]), source, destination)
+    adapter.copy(adapter_config(config), source, destination)
   end
 
   @doc """
@@ -85,10 +85,15 @@ defmodule Depot do
   """
   @spec rename(config, Path.t(), Path.t()) :: :ok | {:error, error_reason}
   def rename(%{adapter: adapter} = config, source, destination) do
-    with :unsupported <- adapter.rename(Map.drop(config, [:adapter]), source, destination),
+    with :unsupported <- adapter.rename(adapter_config(config), source, destination),
          :ok <- copy(config, source, destination),
          :ok <- delete(config, source) do
       :ok
     end
+  end
+
+  @spec adapter_config(config) :: map
+  defp adapter_config(config) do
+    Map.drop(config, [:adapter])
   end
 end
